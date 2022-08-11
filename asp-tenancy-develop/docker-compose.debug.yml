@@ -1,0 +1,59 @@
+version: "3.4"
+services:
+    api:
+        build: ./
+        depends_on:
+            - postgres
+            - rabbitmq
+        networks:
+            asp-network:
+                aliases:
+                    - api-tenancy
+        ports:
+            - "4300:4300"
+            - "9230:9229"
+        environment:
+            - PRIVATE_KEY=MIIBOgIBAAJBAJ+xnPP69wuuiLmiK7RwtZs1tA0gl+PNXvjGV6cJLHPbELaMGq38lsJbmFHNYfBwqw2hao9GEeo5wrMATFhgviECAwEAAQJAedM5dTcjeBnx3AvHY6QIJxvU+569wN9PcGF/RMJO0yI4j3UI5FgNqRcZxLqXc8lgmOFTOYP0cExtj0uW1AH0QQIhAOYQDp2vsMT2EqKOThOylFQXVQbWL0fWSMapwhof7/XlAiEAsbKbbj1QNnrYmoTSVlcW/0TGMXzLl10zIXUdJf64I40CIDfeUF5Uqv25sB7PpgA8jq65F8nYO5UbYYL0+JD1joVNAiB+3ToUwVd0Hc5ouu0EUVcM1kf9atBbd2GawGcYCjvivQIhAMQ7vzbhGEgF0Za2ttxIZYjnba0+LkxoiT2Q8mGKCXpW
+            - PORT=4300
+            - INTERNALKEY=40d1d424-dc37-48b1-a975-16e6fc1fa98a
+            - DB_CONNECTION=postgres://postgres:admin@postgres-tenancy:5432/asp-tenancy
+            - AMQP_CONNECTION=amqp://rabbitmq:admin@rabbitmq-tenancy:5672
+            - AMQP_EMAIL_QUEUE_NAME=email_queue
+            - NEWRELIC_API_KEY=KEY
+        command: ["node", "--inspect=0.0.0.0:9229", "index.js"]
+    postgres:
+        image: postgres:13.4
+        ports:
+            - "5430:5432"
+        environment:
+            - POSTGRES_DB=asp-tenancy
+            - POSTGRES_PASSWORD=admin
+        volumes:
+            - asp-tenancy-postgres-data:/var/lib/postgresql/data
+        networks:
+            asp-network:
+                aliases:
+                    - postgres-tenancy
+    rabbitmq:
+        container_name: "rabbitmq-tenancy"
+        image: rabbitmq:3.8-management-alpine
+        ports:
+            - "5671:5672"
+            - "15671:15672"
+        environment:
+            - RABBITMQ_DEFAULT_USER=rabbitmq
+            - RABBITMQ_DEFAULT_PASS=admin
+        volumes:
+            - asp-tenancy-rabbitmq-data:/var/lib/rabbitmq/data
+        networks:
+            asp-network:
+                aliases:
+                    - rabbitmq-tenancy
+networks:
+    asp-network:
+        name: asp-network
+volumes:
+    asp-tenancy-postgres-data:
+        name: asp-tenancy-postgres-data
+    asp-tenancy-rabbitmq-data:
+        name: asp-tenancy-rabbitmq-data

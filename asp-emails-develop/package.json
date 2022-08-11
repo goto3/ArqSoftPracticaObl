@@ -1,0 +1,20 @@
+{
+  "name": "email",
+  "version": "1.0.0",
+  "description": "-   SMTPHOST = IP al servidor SMTP\r -   SMTPPORT = Puerto del servidor SMTP\r -   SMTPUSER = Nombre de usuario del servidor SMTP\r -   SMTPPASSWORD = Contraseña del servodor SMTP\r -   REDISHOST = IP a la base de datos Redis\r -   REDISPORT = Puerto a la base de datos Redis",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --inspect=0.0.0.0:9229 index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.8.0",
+    "bull": "^3.29.2",
+    "form-data": "^4.0.0",
+    "mailgun.js": "^3.5.9",
+    "newrelic": "^8.6.0",
+    "redis": "^3.1.2"
+  }
+}

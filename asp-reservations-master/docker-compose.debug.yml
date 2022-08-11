@@ -1,0 +1,41 @@
+version: "3.4"
+services:
+    api:
+        build: .
+        depends_on:
+            - postgres
+        networks:
+            asp-network:
+                aliases:
+                    - api
+        ports:
+            - "4303:4300"
+            - "9233:9229"
+        environment:
+            - PRIVATE_KEY=MIICXAIBAAKBgQCXFAMJ4W7J4cpW7FkutDXoHH73I8XBBkdVV5j4X8h39X8eEzMdZ4WvCIxwWwnn6QoWj3HeYKRRcQensJ2mIcosAJSaG6wsUyOgsSvV8/qMnIrApV0m2ieim5PG5XXNUaZJJCd6VWFfCVmgExpqbVeGHnGiCLaAawYhgbBv2V9L1QIDAQABAoGAJIT/3wmRYFemM7DaNgH17e/FeTQ6f1hnMegE4DU3HlhHrBt0Ba2akR7948L9+ANLHvz5x4mQ7ubltNFqqlgMqIsuag0W6N01I1Uo3NPnbHMFEXc4tFWJW310rplHKGPtTqGxCkt7I3BptEYs3lDlg4jk/WPGZSNQ/pt44GHV1tkCQQDMI5P29kQGf7ARdi7WAASBUY7aPh3YZvgU9JaQqoHbn4gVcRU4LZISR4FP4s3PKAUDekJ51snGhMzqNu6NDDEfAkEAvXWPoxhidsCQ48VDXikQxuDTe0IC/djTAjUd0CDAgOP4PhC6K26TBi17vyisIokFel0si86aE77eCZoVywtgiwJAVJfxuwd2TRMgzTuiUQAU3doETqArEgApkdWBh1WBFpfXdrszxeHshDKpfYdJLi0xVq2VWpQNbXyexfgZhs2klQJBAKdQrCIXxdUj6JEOQ5ljYMqSAJIo0OWHV4nqiMKmOftZ2IBPW2pBw5vADTnbXHE/WtQedtmdAlsPw5ztM/PVv1MCQHILQ/YrfdKOZQB6C3R02kmBnW6FsIf3aWfXBBXHKPlb+HsrcYgIf3TO1W725cPNDRnUagBfXiCyB3nvy/U+JjA=
+            - PORT=4300
+            - DBHOST=postgres
+            - DBNAME=ASP
+            - DBUSER=postgres
+            - DBPASSWORD=admin
+            - NEWRELIC_API_KEY=b19201d97bb64f6733282e5cf3bc251363f4NRAL
+        command: ["node", "--inspect=0.0.0.0:9229", "index.js"]
+    postgres:
+        image: postgres:13.4
+        ports:
+            - "5433:5432"
+        environment:
+            - POSTGRES_PASSWORD=admin
+            - POSTGRES_DB=ASP
+        volumes:
+            - asp-reservations-data:/var/lib/postgresql/data
+        networks:
+            asp-network:
+                aliases:
+                    - postgres
+networks:
+    asp-network:
+        name: asp-network
+volumes:
+    asp-reservations-data:
+        name: asp-reservations-data

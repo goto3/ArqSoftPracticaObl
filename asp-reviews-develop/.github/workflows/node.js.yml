@@ -1,0 +1,55 @@
+name: Node.js CI
+
+on:
+    push:
+        branches: [develop, master]
+    pull_request:
+        branches: [develop, master]
+
+jobs:
+    unitTests:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [16.x]
+
+        defaults:
+            run:
+                working-directory: ./
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "npm"
+            - run: npm ci
+            - run: npm run build --if-present
+            - run: npm test
+
+    coverage:
+        strategy:
+            matrix:
+                node-version: [16.x]
+                platform: [ubuntu-latest]
+        runs-on: ${{ matrix.platform }}
+        defaults:
+            run:
+                working-directory: ./
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "npm"
+            - run: npm ci
+            - name: TestCoverage
+              id: testCovergae
+              uses: anuraag016/Jest-Coverage-Diff@master
+              with:
+                  fullCoverageDiff: false
+                  runCommand: "npx jest --coverage --collectCoverage=true --coverageDirectory='./' --coverageReporters='json-summary' --forceExit --detectOpenHandles"
+                  delta: 0.5

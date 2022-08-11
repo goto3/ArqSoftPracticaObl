@@ -1,0 +1,58 @@
+version: "3.4"
+services:
+    api:
+        build: ./
+        depends_on:
+            - postgres
+        networks:
+            asp-network:
+                aliases:
+                    - api-books
+        ports:
+            - "4305:4300"
+            - "9235:9229"
+        environment:
+            - PUBLIC_KEY=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJ+xnPP69wuuiLmiK7RwtZs1tA0gl+PNXvjGV6cJLHPbELaMGq38lsJbmFHNYfBwqw2hao9GEeo5wrMATFhgviECAwEAAQ==
+            - PORT=4300
+            - DB_CONNECTION=postgres://postgres:admin@postgres-books:5432/asp-books
+            - AMQP_CONNECTION=amqp://rabbitmq:admin@rabbitmq-books:5672
+            - AMQP_BOOKS_EXCHANGE=asp-books
+            - AMQP_RESERVATIONS_EXCHANGE=asp-reservations
+            - NEWRELIC_API_KEY=KEY
+        command: ["node", "--inspect=0.0.0.0:9229", "index.js"]
+    postgres:
+        image: postgres:13.4
+        ports:
+            - "5435:5432"
+        environment:
+            - POSTGRES_DB=asp-books
+            - POSTGRES_PASSWORD=admin
+        volumes:
+            - asp-books-postgres-data:/var/lib/postgresql/data
+        networks:
+            asp-network:
+                aliases:
+                    - postgres-books
+    rabbitmq:
+        container_name: "rabbitmq-books"
+        image: rabbitmq:3.8-management-alpine
+        ports:
+            - "5675:5672"
+            - "15675:15672"
+        environment:
+            - RABBITMQ_DEFAULT_USER=rabbitmq
+            - RABBITMQ_DEFAULT_PASS=admin
+        volumes:
+            - asp-books-rabbitmq-data:/var/lib/rabbitmq/data
+        networks:
+            asp-network:
+                aliases:
+                    - rabbitmq-books
+networks:
+    asp-network:
+        name: asp-network
+volumes:
+    asp-books-postgres-data:
+        name: asp-books-postgres-data
+    asp-books-rabbitmq-data:
+        name: asp-books-rabbitmq-data

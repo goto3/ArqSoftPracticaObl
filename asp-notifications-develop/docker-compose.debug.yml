@@ -1,0 +1,44 @@
+version: "3.4"
+services:
+    api:
+        build: ./
+        depends_on:
+            - postgres
+        networks:
+            asp-network:
+                aliases:
+                    - api-notifications
+        ports:
+            - "4306:4300"
+            - "9236:9229"
+        environment:
+            - PUBLIC_KEY=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJ+xnPP69wuuiLmiK7RwtZs1tA0gl+PNXvjGV6cJLHPbELaMGq38lsJbmFHNYfBwqw2hao9GEeo5wrMATFhgviECAwEAAQ==
+            - PORT=4300
+            - DB_CONNECTION=postgres://postgres:admin@postgres-notifications:5432/asp-notifications
+            - AMQP_CONNECTION=amqp://rabbitmq:admin@rabbitmq-books:5672
+            - AMQP_NOTIFICATIONS_QUEUE_NAME=email_queue
+            - AMQP_RESERVATIONS_QUEUE_NAME=reservations_q_notifications
+            - AMQP_RESERVATIONS_EXCHANGE_NAME=asp-reservations
+            - AMQP_PREFETCHCOUNT=100
+            - WORKERTIMEOUT=60000
+            - NEWRELIC_API_KEY=KEY
+        command: ["node", "--inspect=0.0.0.0:9229", "index.js"]
+    postgres:
+        image: postgres:13.4
+        ports:
+            - "5436:5432"
+        environment:
+            - POSTGRES_DB=asp-notifications
+            - POSTGRES_PASSWORD=admin
+        volumes:
+            - asp-notifications-postgres-data:/var/lib/postgresql/data
+        networks:
+            asp-network:
+                aliases:
+                    - postgres-notifications
+networks:
+    asp-network:
+        name: asp-network
+volumes:
+    asp-notifications-postgres-data:
+        name: asp-notifications-postgres-data

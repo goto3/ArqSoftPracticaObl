@@ -1,0 +1,35 @@
+{
+  "name": "asp-reservations",
+  "version": "1.0.0",
+  "description": "Reservations handling microservice",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asp-2021-n8a/asp-reservations.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asp-2021-n8a/asp-reservations/issues"
+  },
+  "homepage": "https://github.com/asp-2021-n8a/asp-reservations#readme",
+  "dependencies": {
+    "@joi/date": "^2.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
+    "http-terminator": "^3.0.3",
+    "joi": "^17.4.2",
+    "joi-objectid": "^4.0.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1",
+    "newrelic": "^8.5.1",
+    "node-os-utils": "^1.3.5",
+    "pg": "^8.7.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.9.0"
+  }
+}

@@ -1,0 +1,42 @@
+version: "3.4"
+services:
+    api:
+        build: ./
+        depends_on:
+            - postgres
+        networks:
+            asp-network:
+                aliases:
+                    - api-reviews
+        ports:
+            - "4301:4300"
+            - "9231:9229"
+        environment:
+            - PUBLIC_KEY=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJ+xnPP69wuuiLmiK7RwtZs1tA0gl+PNXvjGV6cJLHPbELaMGq38lsJbmFHNYfBwqw2hao9GEeo5wrMATFhgviECAwEAAQ==
+            - PORT=4300
+            - DB_CONNECTION=postgres://postgres:admin@postgres-reviews:5432/asp-reviews
+            - AMQP_CONNECTION=amqp://rabbitmq:admin@rabbitmq-books:5672
+            - AMQP_BOOKS_QUEUE_NAME=books_q_reviews
+            - AMQP_BOOKS_EXCHANGE_NAME=asp-books
+            - AMQP_PREFETCH_COUNT=100
+            - NEWRELIC_API_KEY=KEY
+        command: ["node", "--inspect=0.0.0.0:9229", "index.js"]
+    postgres:
+        image: postgres:13.4
+        ports:
+            - "5431:5432"
+        environment:
+            - POSTGRES_DB=asp-reviews
+            - POSTGRES_PASSWORD=admin
+        volumes:
+            - asp-reviews-postgres-data:/var/lib/postgresql/data
+        networks:
+            asp-network:
+                aliases:
+                    - postgres-reviews
+networks:
+    asp-network:
+        name: asp-network
+volumes:
+    asp-reviews-postgres-data:
+        name: asp-reviews-postgres-data

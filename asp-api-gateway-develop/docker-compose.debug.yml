@@ -1,0 +1,35 @@
+version: "3.4"
+services:
+    api:
+        build: .
+        depends_on:
+            - redis
+        networks:
+            asp-network:
+                aliases:
+                    - api
+        ports:
+            - "4299:4300"
+            - "9228:9229"
+        environment:
+            - PORT=4300
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - TENANCY_API=http://api-tenancy:4300/api
+            - BOOKS_API=http://api-books:4300/api
+            - REVIEWS_API=http://api-reviews:4300/api
+            - NOTIFICATIONS_API=http://api-notifications:4300/api
+            - QUERIES_API=http://api-queries:80/api
+            - NEWRELIC_API_KEY=KEY
+        command: ["node", "--inspect=0.0.0.0:9229", "index.js"]
+    redis:
+        image: redis:6.2
+        ports:
+            - "6379:6379"
+        networks:
+            asp-network:
+                aliases:
+                    - redis
+networks:
+    asp-network:
+        name: asp-network

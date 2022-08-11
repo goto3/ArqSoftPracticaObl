@@ -1,0 +1,22 @@
+version: "3.4"
+services:
+    emailworker:
+        build: ./
+        networks:
+            asp-network:
+                aliases:
+                    - emailworker
+        ports:
+            - "9232:9229"
+        environment:
+            - FRONTENDHOST=asp2021.software
+            - EMAILDOMAIN=asp2021.software
+            - MAILGUN_API_KEY=key-3aa3202cca561335240d9a79ec67cb4b
+            - AMQP_CONNECTION=amqps://bbcuiduh:Qm9GVLnwU7Ysc_xKS_3uHKxno-JUnOEu@chimpanzee.rmq.cloudamqp.com/bbcuiduh
+            - AMQP_EMAIL_QUEUE_NAME=email_queue
+            - AMQP_PREFETCH_COUNT=100
+            - NEWRELIC_API_KEY=KEY
+        command: ["node", "--inspect=0.0.0.0:9229", "index.js"]
+networks:
+    asp-network:
+        external: true

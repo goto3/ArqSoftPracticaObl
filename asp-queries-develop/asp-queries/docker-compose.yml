@@ -1,0 +1,51 @@
+version: "3.4"
+services:
+    asp-queries:
+        container_name: "api-queries"
+        image: ${DOCKER_REGISTRY-}aspqueries
+        build:
+            context: .
+            dockerfile: Dockerfile
+        depends_on:
+            - postgres
+        networks:
+            asp-network:
+                aliases:
+                    - api-queries
+        ports:
+            - "4304:80"
+        environment:
+            - CLEARDB=false
+            - DBHOST=postgres-queries
+            - DBPORT=5432
+            - DBNAME=asp-queries
+            - DBUSER=postgres
+            - DBPASSWORD=admin       
+            - AMQP_CONNECTION=amqp://rabbitmq:admin@rabbitmq-books:5672
+            - AMQP_BOOKS_QUEUE=books_q_queries
+            - AMQP_RESERVATIONS_QUEUE=reservations_q_queries
+            - AMQP_BOOKS_EXCHANGE_NAME=asp-books
+            - AMQP_RESERVATIONS_EXCHANGE_NAME=asp-reservations
+            - AMQP_PREFETCH_COUNT=20
+            - NEW_RELIC_LICENSE_KEY=b19201d97bb64f6733282e5cf3bc251363f4NRAL
+             
+    postgres:
+        container_name: "postgres-queries"
+        image: postgres:13.4
+        ports:
+            - "5434:5432"
+        environment:
+            - POSTGRES_DB=asp-queries
+            - POSTGRES_PASSWORD=admin
+        volumes:
+            - asp-queries-postgres-data:/var/lib/postgresql/data
+        networks:
+            asp-network:
+                aliases:
+                    - postgres-queries    
+networks:
+    asp-network:
+        name: asp-network
+volumes:
+    asp-queries-postgres-data:
+        name: asp-queries-postgres-data
